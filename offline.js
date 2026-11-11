@@ -1,19 +1,10 @@
-
-const prefix = 'two-view-assets:' + self.registration.scope + ':';
-const key = prefix + "2b5dbe64873fae56";
-const files = ["./assets/index-7hNrvrPp.js","./assets/index-QX4cJWTK.css","./assets/worker-RvB6zYmz.js","./index.html"];
-self.addEventListener('install',event=>{
-  event.waitUntil(caches.open(key).then(cache=>cache.addAll(files)));
-});
-self.addEventListener('activate',event=>{
-  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(name=>name.startsWith(prefix)&&name!==key).map(name=>caches.delete(name)))).then(()=>self.clients.claim()));
-});
+const prefix='two-view-assets:'+self.registration.scope+':';
+const key=prefix+'single-a3c3f956c48e0c2b';
+self.addEventListener('install',event=>event.waitUntil(caches.open(key).then(cache=>cache.add('./index.html')).then(()=>self.skipWaiting())));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(prefix)&&k!==key).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener('message',event=>{if(event.data==='version')event.ports[0]?.postMessage(key)});
 self.addEventListener('fetch',event=>{
-  const request=event.request;
-  if(request.method!=='GET'||!request.url.startsWith(self.registration.scope))return;
-  if(request.mode==='navigate'){
-    event.respondWith(fetch(request).catch(()=>caches.open(key).then(cache=>cache.match('./index.html'))));
-    return;
-  }
-  event.respondWith(caches.open(key).then(cache=>cache.match(request).then(response=>response||fetch(request))));
+ const req=event.request;
+ if(req.method!=='GET'||!req.url.startsWith(self.registration.scope)||req.mode!=='navigate')return;
+ event.respondWith(fetch(req,{cache:'no-store'}).catch(()=>caches.open(key).then(cache=>cache.match('./index.html'))));
 });
