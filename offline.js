@@ -1,5 +1,5 @@
 const prefix='two-view-assets:'+self.registration.scope+':';
-const key=prefix+'single-a3c3f956c48e0c2b';
+const key=prefix+'single-1ec981a2b169368f';
 self.addEventListener('install',event=>event.waitUntil(caches.open(key).then(cache=>cache.add('./index.html')).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(prefix)&&k!==key).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('message',event=>{if(event.data==='version')event.ports[0]?.postMessage(key)});
